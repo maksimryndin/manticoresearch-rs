@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// MatchOp : Query match expression with logical operator
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MatchOp {
@@ -21,10 +19,6 @@ pub struct MatchOp {
 impl MatchOp {
     /// Query match expression with logical operator
     pub fn new(query_info: serde_json::Value) -> MatchOp {
-        MatchOp {
-            query_info,
-        }
+        MatchOp { query_info }
     }
 }
-
-

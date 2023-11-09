@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// SortMva : Query sort expression for MVA attributes
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SortMva {
@@ -25,15 +23,11 @@ pub struct SortMva {
 impl SortMva {
     /// Query sort expression for MVA attributes
     pub fn new(attr: String, order: Order, mode: Mode) -> SortMva {
-        SortMva {
-            attr,
-            order,
-            mode,
-        }
+        SortMva { attr, order, mode }
     }
 }
 
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Order {
     #[serde(rename = "asc")]
@@ -47,7 +41,7 @@ impl Default for Order {
         Self::Asc
     }
 }
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Mode {
     #[serde(rename = "min")]
@@ -61,4 +55,3 @@ impl Default for Mode {
         Self::Min
     }
 }
-

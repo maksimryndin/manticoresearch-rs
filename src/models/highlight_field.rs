@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// HighlightField : Query Highlight field with options set
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct HighlightField {
@@ -35,5 +33,3 @@ impl HighlightField {
         }
     }
 }
-
-

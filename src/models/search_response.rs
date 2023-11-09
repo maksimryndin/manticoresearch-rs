@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// SearchResponse : Response object of a search request
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SearchResponse {
@@ -41,5 +39,3 @@ impl SearchResponse {
         }
     }
 }
-
-

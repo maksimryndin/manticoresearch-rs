@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// SourceByRules : Query fields to be included/excluded to/from response
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SourceByRules {
@@ -23,11 +21,6 @@ pub struct SourceByRules {
 impl SourceByRules {
     /// Query fields to be included/excluded to/from response
     pub fn new(includes: Vec<String>, excludes: Vec<String>) -> SourceByRules {
-        SourceByRules {
-            includes,
-            excludes,
-        }
+        SourceByRules { includes, excludes }
     }
 }
-
-

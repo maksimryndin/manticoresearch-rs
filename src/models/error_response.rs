@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// ErrorResponse : Error response
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ErrorResponse {
@@ -22,12 +20,10 @@ pub struct ErrorResponse {
 
 impl ErrorResponse {
     /// Error response
-    pub fn new(error: ::std::collections::HashMap<String, serde_json::Value>, status: i32) -> ErrorResponse {
-        ErrorResponse {
-            error,
-            status,
-        }
+    pub fn new(
+        error: ::std::collections::HashMap<String, serde_json::Value>,
+        status: i32,
+    ) -> ErrorResponse {
+        ErrorResponse { error, status }
     }
 }
-
-

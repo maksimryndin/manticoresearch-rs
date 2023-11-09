@@ -1,26 +1,26 @@
 use crate::apis::utils_api::sql;
 use crate::Configuration;
 use chrono::{DateTime, Utc};
-use std::path::Path;
 use serde_repr::Deserialize_repr;
-use tokio::fs;
 use std::collections::hash_map::DefaultHasher;
-use std::hash::Hasher;
 use std::collections::HashMap;
 use std::fmt;
+use std::hash::Hasher;
+use std::path::Path;
+use tokio::fs;
 
-#[derive(Debug, Clone, Deserialize_repr,PartialEq)]
+#[derive(Debug, Clone, Deserialize_repr, PartialEq)]
 #[repr(u8)]
 pub enum MigrationType {
     Up = 0,
-    Down
+    Down,
 }
 
 impl fmt::Display for MigrationType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Up => write!(f, "Up"),
-            Self::Down => write!(f, "Down")
+            Self::Down => write!(f, "Down"),
         }
     }
 }
@@ -40,7 +40,13 @@ impl Migration {
         let mut hasher = DefaultHasher::new();
         hasher.write(contents.as_bytes());
         let checksum = hasher.finish() as i64;
-        Self{name, contents, checksum, typ, applied: None}
+        Self {
+            name,
+            contents,
+            checksum,
+            typ,
+            applied: None,
+        }
     }
 
     pub fn name(&self) -> &str {
@@ -56,14 +62,23 @@ impl Migration {
     }
 
     pub fn applied(&self) -> Option<DateTime<Utc>> {
-        self.applied.map(|t| DateTime::<Utc>::from_timestamp(t as i64, 0).expect("assert: migration timestamp should be correctly created"))
+        self.applied.map(|t| {
+            DateTime::<Utc>::from_timestamp(t as i64, 0)
+                .expect("assert: migration timestamp should be correctly created")
+        })
     }
 }
 
 impl fmt::Display for Migration {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.applied.is_some() {
-            write!(f, "{}({}, {})", self.name(), self.typ(), self.applied().unwrap().format("%Y-%m-%d %H:%M:%S"))
+            write!(
+                f,
+                "{}({}, {})",
+                self.name(),
+                self.typ(),
+                self.applied().unwrap().format("%Y-%m-%d %H:%M:%S")
+            )
         } else {
             write!(f, "{}({}, unapplied)", self.name(), self.typ())
         }
@@ -72,10 +87,14 @@ impl fmt::Display for Migration {
 
 async fn read_migration_script(path: &Path) -> Result<String, String> {
     let contents = fs::read_to_string(path).await.map_err(|e| e.to_string())?;
-    let contents: Vec<&str> = contents.lines().filter(|l| {
-        let line = l.trim();
-        !(line.starts_with("--") || line.is_empty())
-    }).map(|l| l.trim()).collect();
+    let contents: Vec<&str> = contents
+        .lines()
+        .filter(|l| {
+            let line = l.trim();
+            !(line.starts_with("--") || line.is_empty())
+        })
+        .map(|l| l.trim())
+        .collect();
     let contents = contents.join("\n");
     if contents.is_empty() {
         return Err(format!("migration `{}` cannot be empty", path.display()));
@@ -83,7 +102,10 @@ async fn read_migration_script(path: &Path) -> Result<String, String> {
     let mut iter = contents.split(';').peekable();
     while let Some(statement) = iter.next() {
         if iter.peek().is_some() && statement.trim().is_empty() {
-            return Err(format!("migration `{}` contains empty statement: probably an extra `;` is present", path.display()));
+            return Err(format!(
+                "migration `{}` contains empty statement: probably an extra `;` is present",
+                path.display()
+            ));
         }
     }
     Ok(contents)
@@ -105,7 +127,13 @@ impl Migrator {
             bearer_access_token: None,
             api_key: None,
         };
-        Self { configuration, directory: migrations_dir.strip_suffix("/").unwrap_or(migrations_dir).to_string() }
+        Self {
+            configuration,
+            directory: migrations_dir
+                .strip_suffix("/")
+                .unwrap_or(migrations_dir)
+                .to_string(),
+        }
     }
 
     pub fn directory(&self) -> &str {
@@ -113,11 +141,10 @@ impl Migrator {
     }
 
     async fn sql(&self, query: &str) -> Result<Option<serde_json::Value>, String> {
-        let mut data = match sql(
-            &self.configuration, 
-            query, 
-            Some(true))
-        .await.map_err(|e| format!("{e:?}")) {
+        let mut data = match sql(&self.configuration, query, Some(true))
+            .await
+            .map_err(|e| format!("{e:?}"))
+        {
             Ok(data) => data,
             Err(message) => {
                 if message.contains("unknown local table(s) '_migrations' in search request") {
@@ -127,18 +154,20 @@ impl Migrator {
                 }
             }
         };
-        let error: String = serde_json::from_value(data[0]["error"].take()).map_err(|e| e.to_string())?;
+        let error: String =
+            serde_json::from_value(data[0]["error"].take()).map_err(|e| e.to_string())?;
         if !error.is_empty() {
             tracing::error!("{}", error);
         }
-        let warning: String = serde_json::from_value(data[0]["warning"].take()).map_err(|e| e.to_string())?;
+        let warning: String =
+            serde_json::from_value(data[0]["warning"].take()).map_err(|e| e.to_string())?;
         if !warning.is_empty() {
             tracing::warn!("{}", warning);
         }
         Ok(Some(data[0]["data"].take()))
     }
 
-    async fn initialize(&mut self) -> Result<(), String> {
+    async fn initialize(&self) -> Result<(), String> {
         self.sql(
             "CREATE TABLE IF NOT EXISTS _migrations(name string, applied timestamp, checksum bigint, typ bit(3))",
         )
@@ -148,19 +177,30 @@ impl Migrator {
 
     async fn list_dir(&self) -> Result<Vec<(Migration, Migration)>, String> {
         let mut dirs = vec![];
-        let mut directory = fs::read_dir(&self.directory).await.map_err(|e| e.to_string())?;
+        let mut directory = fs::read_dir(&self.directory).await.map_err(|e| {
+            format!(
+                "cannot list migrations for directory `{}`: {e:?}",
+                &self.directory
+            )
+        })?;
         loop {
             match directory.next_entry().await {
                 Ok(Some(dir)) => {
-                    let name = dir.file_name().into_string().map_err(|e| format!("{e:?}"))?;
-                    if name.len() != 14 { // `yyyymmddhhmmss`
+                    let name = dir
+                        .file_name()
+                        .into_string()
+                        .map_err(|e| format!("{e:?}"))?;
+                    if name.len() != 14 {
+                        // `yyyymmddhhmmss`
                         continue;
                     }
                     dirs.push((
-                        name.parse::<u64>().map_err(|e| format!("Migration subdirectory should be named `yyyymmddhhmmss`: {e}"))?,
-                        dir
+                        name.parse::<u64>().map_err(|e| {
+                            format!("Migration subdirectory should be named `yyyymmddhhmmss`: {e}")
+                        })?,
+                        dir,
                     ));
-                },
+                }
                 Ok(None) => break,
                 Err(e) => return Err(e.to_string()),
             }
@@ -180,53 +220,70 @@ impl Migrator {
         Ok(migrations)
     }
 
-    pub async fn history(&mut self) -> Result<Vec<Migration>, String> {
-        let data_option = self.sql(
-            "
+    pub async fn history(&self) -> Result<Vec<Migration>, String> {
+        let data_option = self
+            .sql(
+                "
             SELECT name, applied, checksum, typ
             FROM _migrations
             ORDER BY applied ASC;
-            ")
-        .await?;
+            ",
+            )
+            .await?;
         if let Some(data) = data_option {
-            let migrations: Vec<Migration> = serde_json::from_value(data).map_err(|e| e.to_string())?;
+            let migrations: Vec<Migration> =
+                serde_json::from_value(data).map_err(|e| e.to_string())?;
             Ok(migrations)
         } else {
             Ok(vec![])
         }
     }
 
-    async fn last_applied_migrations(&mut self) -> Result<HashMap<String, Migration>, String> {
-        let applied_migrations_option = self.sql(
-            "
+    async fn last_applied_migrations(&self) -> Result<HashMap<String, Migration>, String> {
+        let applied_migrations_option = self
+            .sql(
+                "
             SELECT name, applied, checksum, typ
             FROM _migrations
             ORDER BY applied ASC;
-            ")
-        .await?;
+            ",
+            )
+            .await?;
         if let Some(applied_migrations) = applied_migrations_option {
-            let applied_migrations: Vec<Migration> = serde_json::from_value(applied_migrations).map_err(|e| e.to_string())?;
-            let last_applied_migrations: HashMap<String, Migration> = applied_migrations.into_iter().fold(HashMap::new(), |mut map, m| {
-                map.insert(m.name().to_string(), m);
-                map
-            });
+            let applied_migrations: Vec<Migration> =
+                serde_json::from_value(applied_migrations).map_err(|e| e.to_string())?;
+            let last_applied_migrations: HashMap<String, Migration> = applied_migrations
+                .into_iter()
+                .fold(HashMap::new(), |mut map, m| {
+                    map.insert(m.name().to_string(), m);
+                    map
+                });
             Ok(last_applied_migrations)
         } else {
             Ok(HashMap::new())
         }
     }
 
-    pub async fn list(&mut self) -> Result<Vec<Migration>, String> {
+    pub async fn list(&self) -> Result<Vec<Migration>, String> {
         let migrations = self.list_dir().await?;
         let last_applied_migrations = self.last_applied_migrations().await?;
         let mut actual_migrations = vec![];
         for (mut up_migration, down_migration) in migrations.into_iter() {
             if let Some(applied) = last_applied_migrations.get(up_migration.name()) {
-                if applied.typ == MigrationType::Up && up_migration.checksum() != applied.checksum() {
-                    return Err(format!("checksum of the migration `{}` has changed since it was applied", applied));
+                if applied.typ == MigrationType::Up && up_migration.checksum() != applied.checksum()
+                {
+                    return Err(format!(
+                        "checksum of the migration `{}` has changed since it was applied",
+                        applied
+                    ));
                 }
-                if applied.typ == MigrationType::Down && down_migration.checksum() != applied.checksum() {
-                    return Err(format!("checksum of the migration `{}` has changed since it was applied", applied));
+                if applied.typ == MigrationType::Down
+                    && down_migration.checksum() != applied.checksum()
+                {
+                    return Err(format!(
+                        "checksum of the migration `{}` has changed since it was applied",
+                        applied
+                    ));
                 }
                 if applied.typ == MigrationType::Down {
                     continue;
@@ -234,11 +291,11 @@ impl Migrator {
                 up_migration.applied = applied.applied;
             }
             actual_migrations.push(up_migration);
-        } 
+        }
         Ok(actual_migrations)
     }
 
-    pub async fn up(&mut self, fake: bool) -> Result<Vec<Migration>, String> {
+    pub async fn up(&self, fake: bool) -> Result<Vec<Migration>, String> {
         self.initialize().await?;
         let last_applied_migrations = self.last_applied_migrations().await?;
         let migrations = self.list_dir().await?;
@@ -252,7 +309,7 @@ impl Migrator {
             tracing::info!("applying `{}`...", migration);
             let mut iter = migration.contents.split(';').peekable();
             while let Some(statement) = iter.next() {
-                if iter.peek().is_none(){
+                if iter.peek().is_none() {
                     break;
                 }
                 if fake {
@@ -264,11 +321,13 @@ impl Migrator {
             if fake {
                 continue;
             }
-            self.sql(
-                &format!("INSERT INTO _migrations(name, applied, checksum, typ) VALUES ('{}', {}, {}, {})",
-                    migration.name(), Utc::now().timestamp(), migration.checksum(), migration.typ() as u8
-                )
-            )
+            self.sql(&format!(
+                "INSERT INTO _migrations(name, applied, checksum, typ) VALUES ('{}', {}, {}, {})",
+                migration.name(),
+                Utc::now().timestamp(),
+                migration.checksum(),
+                migration.typ() as u8
+            ))
             .await?;
             tracing::info!("applied `{}`", migration);
             applied_migrations.push(migration);
@@ -276,22 +335,31 @@ impl Migrator {
         Ok(applied_migrations)
     }
 
-    pub async fn down(&mut self, fake: bool, name: &str) -> Result<Vec<Migration>, String> {
+    pub async fn down(&self, fake: bool, name: &str) -> Result<Vec<Migration>, String> {
         let last_applied_migrations = self.last_applied_migrations().await?;
         if let Some(applied) = last_applied_migrations.get(name) {
             if applied.typ == MigrationType::Down {
-                return Err(format!("migration with the name `{name}` has been already rolled back"));
+                return Err(format!(
+                    "migration with the name `{name}` has been already rolled back"
+                ));
             }
         } else {
-            return Err(format!("migration with the name `{name}` is not found among applied migrations"));
+            return Err(format!(
+                "migration with the name `{name}` is not found among applied migrations"
+            ));
         }
 
         let migrations = self.list_dir().await?;
         let mut rolled_backed_migrations = vec![];
         for (mut up_migration, down_migration) in migrations.into_iter().rev() {
             if let Some(applied) = last_applied_migrations.get(up_migration.name()) {
-                if applied.typ == MigrationType::Down && down_migration.checksum() != applied.checksum() {
-                    return Err(format!("checksum of the migration `{}` has changed since it was applied", applied));
+                if applied.typ == MigrationType::Down
+                    && down_migration.checksum() != applied.checksum()
+                {
+                    return Err(format!(
+                        "checksum of the migration `{}` has changed since it was applied",
+                        applied
+                    ));
                 }
                 if applied.typ == MigrationType::Down {
                     continue;
@@ -303,7 +371,7 @@ impl Migrator {
             tracing::info!("rolling back `{}`...", up_migration);
             let mut iter = down_migration.contents.split(';').peekable();
             while let Some(statement) = iter.next() {
-                if iter.peek().is_none(){
+                if iter.peek().is_none() {
                     break;
                 }
                 if fake {
@@ -315,11 +383,13 @@ impl Migrator {
             if fake {
                 continue;
             }
-            self.sql(
-                &format!("INSERT INTO _migrations(name, applied, checksum, typ) VALUES ('{}', {}, {}, {})",
-                down_migration.name(), Utc::now().timestamp(), down_migration.checksum(), down_migration.typ() as u8
-                )
-            )
+            self.sql(&format!(
+                "INSERT INTO _migrations(name, applied, checksum, typ) VALUES ('{}', {}, {}, {})",
+                down_migration.name(),
+                Utc::now().timestamp(),
+                down_migration.checksum(),
+                down_migration.typ() as u8
+            ))
             .await?;
             tracing::info!("rolled back `{}`", up_migration);
             if down_migration.name == name {
@@ -327,7 +397,6 @@ impl Migrator {
                 break;
             }
             rolled_backed_migrations.push(down_migration);
-            
         }
         Ok(rolled_backed_migrations)
     }
@@ -335,9 +404,21 @@ impl Migrator {
     pub async fn add(&self) -> Result<String, String> {
         let dir_name = Utc::now().format("%Y%m%d%H%M%S");
         let base_name = format!("{}/{dir_name}", self.directory);
-        fs::create_dir_all(&base_name).await.map_err(|e| format!("{e:?}"))?;
-        fs::write(format!("{base_name}/up.sql"), "--Put a new migration here. Prefer idempotence, i.e. `CREATE TABLE IF NOT EXISTS`").await.map_err(|e| format!("{e:?}"))?;
-        fs::write(format!("{base_name}/down.sql"), "--Put a rollback migration here. Prefer idempotence, i.e. `DROP TABLE IF EXISTS`").await.map_err(|e| format!("{e:?}"))?;
+        fs::create_dir_all(&base_name)
+            .await
+            .map_err(|e| format!("{e:?}"))?;
+        fs::write(
+            format!("{base_name}/up.sql"),
+            "--Put a new migration here. Prefer idempotence, i.e. `CREATE TABLE IF NOT EXISTS`",
+        )
+        .await
+        .map_err(|e| format!("{e:?}"))?;
+        fs::write(
+            format!("{base_name}/down.sql"),
+            "--Put a rollback migration here. Prefer idempotence, i.e. `DROP TABLE IF EXISTS`",
+        )
+        .await
+        .map_err(|e| format!("{e:?}"))?;
         Ok(base_name)
     }
 }

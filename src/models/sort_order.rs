@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// SortOrder : Query sort expression
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SortOrder {
@@ -23,14 +21,11 @@ pub struct SortOrder {
 impl SortOrder {
     /// Query sort expression
     pub fn new(attr: String, order: Order) -> SortOrder {
-        SortOrder {
-            attr,
-            order,
-        }
+        SortOrder { attr, order }
     }
 }
 
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Order {
     #[serde(rename = "asc")]
@@ -44,4 +39,3 @@ impl Default for Order {
         Self::Asc
     }
 }
-

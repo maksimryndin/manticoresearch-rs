@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// GeoDistanceFilter : Geo distance attribute filter
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct GeoDistanceFilter {
@@ -37,7 +35,7 @@ impl GeoDistanceFilter {
     }
 }
 
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum DistanceType {
     #[serde(rename = "adaptive")]
@@ -51,4 +49,3 @@ impl Default for DistanceType {
         Self::Adaptive
     }
 }
-

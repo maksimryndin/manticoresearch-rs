@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// SortMultiple : Query sort expression for multiple attributes
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SortMultiple {
@@ -22,12 +20,10 @@ pub struct SortMultiple {
 
 impl SortMultiple {
     /// Query sort expression for multiple attributes
-    pub fn new(attrs: ::std::collections::HashMap<String, serde_json::Value>, replace: bool) -> SortMultiple {
-        SortMultiple {
-            attrs,
-            replace,
-        }
+    pub fn new(
+        attrs: ::std::collections::HashMap<String, serde_json::Value>,
+        replace: bool,
+    ) -> SortMultiple {
+        SortMultiple { attrs, replace }
     }
 }
-
-

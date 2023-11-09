@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// EqualsFilter : Equals attribute filter
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct EqualsFilter {
@@ -23,11 +21,6 @@ pub struct EqualsFilter {
 impl EqualsFilter {
     /// Equals attribute filter
     pub fn new(field: String, value: serde_json::Value) -> EqualsFilter {
-        EqualsFilter {
-            field,
-            value,
-        }
+        EqualsFilter { field, value }
     }
 }
-
-

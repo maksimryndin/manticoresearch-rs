@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// MatchOpFilter : Query match expression
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MatchOpFilter {
@@ -33,7 +31,7 @@ impl MatchOpFilter {
     }
 }
 
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Operator {
     #[serde(rename = "or")]
@@ -47,4 +45,3 @@ impl Default for Operator {
         Self::Or
     }
 }
-

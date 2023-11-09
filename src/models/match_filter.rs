@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// MatchFilter : Query match filter
-
-
 
 #[derive(Clone, Debug, PartialEq, Deserialize)]
 pub struct MatchFilter {
@@ -29,5 +27,3 @@ impl MatchFilter {
         }
     }
 }
-
-

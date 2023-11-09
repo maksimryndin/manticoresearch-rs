@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// QueryFilter : Query string filter
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct QueryFilter {
@@ -21,10 +19,6 @@ pub struct QueryFilter {
 impl QueryFilter {
     /// Query string filter
     pub fn new(query_string: String) -> QueryFilter {
-        QueryFilter {
-            query_string,
-        }
+        QueryFilter { query_string }
     }
 }
-
-

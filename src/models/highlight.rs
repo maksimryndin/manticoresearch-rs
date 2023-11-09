@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// Highlight : Query HIGHLIGHT expression
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Highlight {
@@ -20,7 +18,12 @@ pub struct Highlight {
     pub fields: Option<Vec<crate::models::HighlightField>>,
     #[serde(rename = "encoder", skip_serializing_if = "Option::is_none")]
     pub encoder: Option<Encoder>,
-    #[serde(rename = "highlight_query", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "highlight_query",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub highlight_query: Option<Option<::std::collections::HashMap<String, serde_json::Value>>>,
     #[serde(rename = "pre_tags", skip_serializing_if = "Option::is_none")]
     pub pre_tags: Option<String>,
@@ -30,7 +33,10 @@ pub struct Highlight {
     pub no_match_size: Option<NoMatchSize>,
     #[serde(rename = "fragment_size", skip_serializing_if = "Option::is_none")]
     pub fragment_size: Option<i32>,
-    #[serde(rename = "number_of_fragments", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "number_of_fragments",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub number_of_fragments: Option<i32>,
     #[serde(rename = "limit", skip_serializing_if = "Option::is_none")]
     pub limit: Option<i32>,
@@ -90,7 +96,7 @@ impl Highlight {
     }
 }
 
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Encoder {
     #[serde(rename = "default")]
@@ -104,7 +110,7 @@ impl Default for Encoder {
         Self::Default
     }
 }
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum NoMatchSize {
     #[serde(rename = "0")]
@@ -118,7 +124,7 @@ impl Default for NoMatchSize {
         Self::Variant0
     }
 }
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum HtmlStripMode {
     #[serde(rename = "none")]
@@ -136,7 +142,7 @@ impl Default for HtmlStripMode {
         Self::None
     }
 }
-/// 
+///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum SnippetBoundary {
     #[serde(rename = "sentence")]
@@ -152,4 +158,3 @@ impl Default for SnippetBoundary {
         Self::Sentence
     }
 }
-

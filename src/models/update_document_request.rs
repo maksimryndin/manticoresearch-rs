@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// UpdateDocumentRequest : Payload for update document
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UpdateDocumentRequest {
@@ -23,13 +21,21 @@ pub struct UpdateDocumentRequest {
     #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     /// Query tree object
-    #[serde(rename = "query", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "query",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub query: Option<Option<::std::collections::HashMap<String, serde_json::Value>>>,
 }
 
 impl UpdateDocumentRequest {
     /// Payload for update document
-    pub fn new(index: String, doc: ::std::collections::HashMap<String, serde_json::Value>) -> UpdateDocumentRequest {
+    pub fn new(
+        index: String,
+        doc: ::std::collections::HashMap<String, serde_json::Value>,
+    ) -> UpdateDocumentRequest {
         UpdateDocumentRequest {
             index,
             doc,
@@ -38,5 +44,3 @@ impl UpdateDocumentRequest {
         }
     }
 }
-
-

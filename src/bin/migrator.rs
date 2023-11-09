@@ -1,9 +1,9 @@
 use clap::{Parser, Subcommand};
 use manticoresearch_rs::migrator::Migrator;
+use tracing::Level;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing::Level;
 
 /// Manticoresearch migration cli.
 #[derive(Parser)]
@@ -26,13 +26,13 @@ enum Commands {
     /// Migrate forward applying up migrations
     Up {
         /// Don't apply - only print sql statements
-        #[arg(long, default_value_t=false)]
+        #[arg(long, default_value_t = false)]
         fake: bool,
     },
     /// Rollback to a specific down migration
     Down {
         /// Don't apply - only print sql statements
-        #[arg(long, default_value_t=false)]
+        #[arg(long, default_value_t = false)]
         fake: bool,
         /// Migration name (`yyyymmddhhmmss`)
         migration: String,
@@ -55,63 +55,74 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let mut migrator = Migrator::new(connection, directory);
+    let migrator = Migrator::new(connection, directory);
 
     match &cli.command {
-        Commands::Up{fake} => {
+        Commands::Up { fake } => {
             let applied = migrator.up(*fake).await.unwrap();
             if applied.is_empty() {
                 println!("All migrations are already applied");
             } else {
-                let names: Vec<String> = applied.into_iter().map(|m| m.name().to_string()).collect();
+                let names: Vec<String> =
+                    applied.into_iter().map(|m| m.name().to_string()).collect();
                 println!("Applied:\n{}", names.join("\n"));
             }
-        },
+        }
         Commands::Down { fake, migration } => {
             let applied = migrator.down(*fake, migration).await.unwrap();
             if applied.is_empty() {
-                println!("All migrations back to {migration} (including it) are already rolled back");
+                println!(
+                    "All migrations back to {migration} (including it) are already rolled back"
+                );
             } else {
-                let names: Vec<String> = applied.into_iter().map(|m| m.name().to_string()).collect();
+                let names: Vec<String> =
+                    applied.into_iter().map(|m| m.name().to_string()).collect();
                 println!("Rolled back:\n{}", names.join("\n"));
             }
-        },
+        }
         Commands::List => {
             let migrations = migrator.list().await.unwrap();
-            println!(
-                "\n{: <14} | {: ^20}",
-                "name", "applied"
-            );
-            println!(
-                "-------------------------------------",
-            );
+            println!("\n{: <14} | {: ^20}", "name", "applied");
+            println!("-------------------------------------",);
             for migration in migrations {
-                println!("{: <14} | {: ^20}", 
-                migration.name(),
-                migration.applied().map(|t| t.format("%Y-%m-%d %H:%M:%S").to_string()).unwrap_or_else(|| "x".to_string()));
+                println!(
+                    "{: <14} | {: ^20}",
+                    migration.name(),
+                    migration
+                        .applied()
+                        .map(|t| t.format("%Y-%m-%d %H:%M:%S").to_string())
+                        .unwrap_or_else(|| "x".to_string())
+                );
             }
             println!("\n");
-        },
+        }
         Commands::History => {
             let migrations = migrator.history().await.unwrap();
             println!(
                 "\n{: <14} | {: <4} | {: ^20} | {: ^20}",
                 "name", "typ", "applied", "checksum"
             );
-            println!(
-                "--------------------------------------------------------------------",
-            );
+            println!("--------------------------------------------------------------------",);
             for migration in migrations {
-                println!("{: <14} | {: <4} | {: ^20} | {: ^20}", 
-                migration.name(), format!("{}", migration.typ()), 
-                migration.applied().map(|t| t.format("%Y-%m-%d %H:%M:%S").to_string()).unwrap_or_else(|| "x".to_string()),
-                migration.checksum());
+                println!(
+                    "{: <14} | {: <4} | {: ^20} | {: ^20}",
+                    migration.name(),
+                    format!("{}", migration.typ()),
+                    migration
+                        .applied()
+                        .map(|t| t.format("%Y-%m-%d %H:%M:%S").to_string())
+                        .unwrap_or_else(|| "x".to_string()),
+                    migration.checksum()
+                );
             }
             println!("\n");
-        },
+        }
         Commands::Add => {
             let dir_name = migrator.add().await.unwrap();
-            println!("added migration template at {}/{dir_name}", migrator.directory());
-        },
+            println!(
+                "added migration template at {}/{dir_name}",
+                migrator.directory()
+            );
+        }
     }
 }

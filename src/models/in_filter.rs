@@ -1,7 +1,7 @@
 /*
  * Manticore Search Client
  *
- * Сlient for Manticore Search. 
+ * Сlient for Manticore Search.
  *
  * The version of the OpenAPI document: 3.3.1
  * Contact: info@manticoresearch.com
@@ -9,8 +9,6 @@
  */
 
 /// InFilter : In attribute filter
-
-
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct InFilter {
@@ -23,11 +21,6 @@ pub struct InFilter {
 impl InFilter {
     /// In attribute filter
     pub fn new(field: String, values: Vec<serde_json::Value>) -> InFilter {
-        InFilter {
-            field,
-            values,
-        }
+        InFilter { field, values }
     }
 }
-
-
