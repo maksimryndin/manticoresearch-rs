@@ -11,7 +11,7 @@
 /// SearchResponse : Response object of a search request
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct SearchResponse {
+pub struct SearchResponse<T = serde_json::Value> {
     #[serde(rename = "took", skip_serializing_if = "Option::is_none")]
     pub took: Option<i32>,
     #[serde(rename = "timed_out", skip_serializing_if = "Option::is_none")]
@@ -19,16 +19,16 @@ pub struct SearchResponse {
     #[serde(rename = "aggregations", skip_serializing_if = "Option::is_none")]
     pub aggregations: Option<::std::collections::HashMap<String, serde_json::Value>>,
     #[serde(rename = "hits", skip_serializing_if = "Option::is_none")]
-    pub hits: Option<Box<crate::models::SearchResponseHits>>,
+    pub hits: Option<Box<crate::models::SearchResponseHits<T>>>,
     #[serde(rename = "profile", skip_serializing_if = "Option::is_none")]
     pub profile: Option<serde_json::Value>,
     #[serde(rename = "warning", skip_serializing_if = "Option::is_none")]
     pub warning: Option<::std::collections::HashMap<String, serde_json::Value>>,
 }
 
-impl SearchResponse {
+impl<T> SearchResponse<T> {
     /// Response object of a search request
-    pub fn new() -> SearchResponse {
+    pub fn new() -> SearchResponse<T> {
         SearchResponse {
             took: None,
             timed_out: None,

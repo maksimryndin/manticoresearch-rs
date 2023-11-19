@@ -60,10 +60,82 @@ fn main() {
     )
     .unwrap();
     replace("src/models/match_filter.rs", r#"Serialize, "#, "").unwrap();
+
+    replace(
+        "src/models/search_response.rs",
+        r#"struct SearchResponse {"#,
+        "struct SearchResponse<T = serde_json::Value> {",
+    )
+    .unwrap();
+    replace(
+        "src/models/search_response.rs",
+        r#"impl SearchResponse {"#,
+        "impl<T> SearchResponse<T> {",
+    )
+    .unwrap();
+    replace(
+        "src/models/search_response.rs",
+        r#"models::SearchResponseHits>>"#,
+        "models::SearchResponseHits<T>>>",
+    )
+    .unwrap();
+    replace(
+        "src/models/search_response.rs",
+        r#"-> SearchResponse {"#,
+        "-> SearchResponse<T> {",
+    )
+    .unwrap();
+
+    replace(
+        "src/models/search_response_hits.rs",
+        r#"Vec<serde_json::Value>"#,
+        "Vec<T>",
+    )
+    .unwrap();
+    replace(
+        "src/models/search_response_hits.rs",
+        r#"struct SearchResponseHits {"#,
+        "struct SearchResponseHits<T = serde_json::Value> {",
+    )
+    .unwrap();
+    replace(
+        "src/models/search_response_hits.rs",
+        r#"impl SearchResponseHits {"#,
+        "impl<T> SearchResponseHits<T> {",
+    )
+    .unwrap();
+    replace(
+        "src/models/search_response_hits.rs",
+        r#"-> SearchResponseHits {"#,
+        "-> SearchResponseHits<T> {",
+    )
+    .unwrap();
+
+    replace(
+        "src/apis/utils_api.rs",
+        r#"raw_response: Option<bool>"#,
+        r#"raw_response: bool"#,
+    )
+    .unwrap();
+
+    replace(
+        "src/apis/utils_api.rs",
+        r#"let Some(ref local_var_str) = raw_response"#,
+        r#"raw_response"#,
+    )
+    .unwrap();
+
+    replace(
+        "src/apis/utils_api.rs",
+        r#"("raw_response", &local_var_str.to_string())"#,
+        r#"("raw_response", &raw_response.to_string())"#,
+    )
+    .unwrap();
+
     replace(
         "src/apis/utils_api.rs",
         r#"local_var_req_builder = local_var_req_builder.json(&body);"#,
-        r#"local_var_req_builder = if let Some(true) = raw_response {
+        r#"local_var_req_builder = if raw_response {
         local_var_req_builder.form(&[("query", body), ("mode", "raw")])
     } else {
         local_var_req_builder.form(&[("query", body)])

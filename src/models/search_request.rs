@@ -29,9 +29,9 @@ pub struct SearchRequest {
     #[serde(rename = "sort", skip_serializing_if = "Option::is_none")]
     pub sort: Option<Vec<serde_json::Value>>,
     #[serde(rename = "aggs", skip_serializing_if = "Option::is_none")]
-    pub aggs: Option<Vec<crate::models::Aggregation>>,
+    pub aggs: Option<::std::collections::HashMap<String, crate::models::Aggregation>>,
     #[serde(rename = "expressions", skip_serializing_if = "Option::is_none")]
-    pub expressions: Option<Vec<serde_json::Value>>,
+    pub expressions: Option<::std::collections::HashMap<String, String>>,
     #[serde(rename = "highlight", skip_serializing_if = "Option::is_none")]
     pub highlight: Option<Box<crate::models::Highlight>>,
     #[serde(rename = "_source", skip_serializing_if = "Option::is_none")]

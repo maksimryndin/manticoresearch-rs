@@ -141,7 +141,7 @@ impl Migrator {
     }
 
     async fn sql(&self, query: &str) -> Result<Option<serde_json::Value>, String> {
-        let mut data = match sql(&self.configuration, query, Some(true))
+        let mut data = match sql(&self.configuration, query, true)
             .await
             .map_err(|e| format!("{e:?}"))
         {
@@ -168,6 +168,7 @@ impl Migrator {
     }
 
     async fn initialize(&self) -> Result<(), String> {
+        tracing::info!("Creating an internal table `_migrations`");
         self.sql(
             "CREATE TABLE IF NOT EXISTS _migrations(name string, applied timestamp, checksum bigint, typ bit(3))",
         )

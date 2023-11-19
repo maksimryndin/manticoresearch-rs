@@ -9,7 +9,7 @@
  */
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct SearchResponseHits {
+pub struct SearchResponseHits<T = serde_json::Value> {
     #[serde(rename = "max_score", skip_serializing_if = "Option::is_none")]
     pub max_score: Option<i32>,
     #[serde(rename = "total", skip_serializing_if = "Option::is_none")]
@@ -17,11 +17,11 @@ pub struct SearchResponseHits {
     #[serde(rename = "total_relation", skip_serializing_if = "Option::is_none")]
     pub total_relation: Option<String>,
     #[serde(rename = "hits", skip_serializing_if = "Option::is_none")]
-    pub hits: Option<Vec<serde_json::Value>>,
+    pub hits: Option<Vec<T>>,
 }
 
-impl SearchResponseHits {
-    pub fn new() -> SearchResponseHits {
+impl<T> SearchResponseHits<T> {
+    pub fn new() -> SearchResponseHits<T> {
         SearchResponseHits {
             max_score: None,
             total: None,

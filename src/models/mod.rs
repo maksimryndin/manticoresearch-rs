@@ -1,5 +1,9 @@
 pub mod aggregation;
 pub use self::aggregation::Aggregation;
+pub mod aggregation_sort_inner_value;
+pub use self::aggregation_sort_inner_value::AggregationSortInnerValue;
+pub mod aggregation_terms;
+pub use self::aggregation_terms::AggregationTerms;
 pub mod bool_filter;
 pub use self::bool_filter::BoolFilter;
 pub mod bulk_response;
